@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inventory System System</title>
+    <title>Inventory System</title>
     <link id="dynamicFavicon" rel="icon" type="image/png" href="https://s6.imgcdn.dev/Y3dmj8.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Library untuk Export PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Library untuk Export Excel (SheetJS) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
@@ -289,8 +295,8 @@
                     <h3 class="font-bold text-slate-800"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Peminjaman Terbaru</h3>
                     <button onclick="navigate('riwayat_peminjaman')" class="text-xs bg-white border border-slate-300 text-slate-600 font-bold px-3 py-1.5 rounded-lg hover:bg-slate-100 transition">Lihat Semua</button>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
                         <thead class="bg-white text-slate-500 border-b border-slate-100 text-xs uppercase tracking-wider">
                             <tr><th class="px-5 py-3">ID Peminjaman</th><th class="px-5 py-3">Peminjam</th><th class="px-5 py-3">Lokasi</th><th class="px-5 py-3">Tanggal Pinjam</th><th class="px-5 py-3 text-center">Status</th></tr>
                         </thead>
@@ -391,9 +397,9 @@
                         </div>
                         <div id="brwStockHint" class="hidden mt-1 text-[10px] font-bold px-2 text-emerald-600 text-right">Tersedia di sistem: <span id="brwStockVal" class="text-sm">0</span></div>
 
-                        <!-- Cart Table -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden mt-4 shadow-sm">
-                            <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
+                        <!-- Cart Table (Diberi wrapper agar bisa di-scroll horizontal di mobile) -->
+                        <div class="border border-slate-200 rounded-xl overflow-x-auto mt-4 shadow-sm custom-scrollbar">
+                            <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
                                 <thead class="bg-slate-100 border-b border-slate-200 text-slate-600 text-xs uppercase">
                                     <tr>
                                         <th class="px-4 py-3 w-10 text-center">#</th>
@@ -450,8 +456,8 @@
                 <!-- List Pilihan -->
                 <div id="retSelectionBox" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div class="p-4 border-b border-slate-100 bg-slate-50"><h3 class="font-bold text-slate-700">Pilih Transaksi Peminjaman</h3></div>
-                    <div class="overflow-x-auto p-0">
-                        <table class="w-full text-left text-sm whitespace-nowrap">
+                    <div class="overflow-x-auto p-0 custom-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap min-w-[600px]">
                             <thead class="bg-white text-slate-500 text-xs uppercase border-b border-slate-100">
                                 <tr><th class="px-5 py-3">ID Transaksi</th><th class="px-5 py-3">Tanggal Pinjam</th><th class="px-5 py-3">Peminjam</th><th class="px-5 py-3 text-center">Status</th><th class="px-5 py-3 text-center">Aksi</th></tr>
                             </thead>
@@ -475,8 +481,8 @@
                         <p class="text-xs text-amber-800 font-medium mb-1"><i class="fa-solid fa-circle-info mr-1"></i> <b>Instruksi:</b> Isi jumlah barang yang dikembalikan dengan kondisi BAIK pada kolom "Kembali Baik". Jika ada yang hilang/rusak, isi pada kolom "Rusak/Hilang" dan wajib sertakan keterangan.</p>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl mb-6 shadow-sm">
-                        <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl mb-6 shadow-sm custom-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
                             <thead class="bg-slate-100 text-slate-600 border-b border-slate-200 text-xs uppercase tracking-wider">
                                 <tr>
                                     <th class="px-4 py-3">Detail Barang</th>
@@ -519,8 +525,9 @@
                     </div>
                     <div class="flex gap-2 flex-wrap" id="tableActionsContainer">
                         <button onclick="refreshGlobalData(this)" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-blue-100 transition shadow-sm flex items-center"><i class="fa-solid fa-rotate-right mr-1.5"></i> Refresh</button>
-                        <button onclick="exportTable('pdf')" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-red-100 transition shadow-sm flex items-center"><i class="fa-solid fa-file-pdf mr-1.5"></i> PDF</button>
-                        <button onclick="exportTable('excel')" class="bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-green-100 transition shadow-sm flex items-center"><i class="fa-solid fa-file-excel mr-1.5"></i> Excel</button>
+                        <!-- Diperbarui agar memanggil fungsi export yang sudah kita buat -->
+                        <button onclick="exportTableToPDF('tableDatabase', 'Rekap_Database_Stok')" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-red-100 transition shadow-sm flex items-center"><i class="fa-solid fa-file-pdf mr-1.5"></i> PDF</button>
+                        <button onclick="exportTableToExcel('tableDatabase', 'Rekap_Database_Stok')" class="bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-green-100 transition shadow-sm flex items-center"><i class="fa-solid fa-file-excel mr-1.5"></i> Excel</button>
                     </div>
                 </div>
                 <div class="flex flex-col md:flex-row gap-3 items-center w-full">
@@ -533,8 +540,8 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full overflow-x-auto p-0 data-fade" id="wrapDataTable">
-                <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
+            <div class="w-full overflow-x-auto p-0 data-fade custom-scrollbar" id="wrapDataTable">
+                <table id="tableDatabase" class="w-full text-left text-sm whitespace-nowrap min-w-max">
                     <thead class="bg-slate-50 text-slate-600 border-b border-slate-100 shadow-sm text-xs uppercase tracking-wider">
                         <tr>
                             <th class="px-5 py-3">ID Barang</th>
@@ -545,7 +552,8 @@
                             <th class="px-5 py-3 text-center text-rose-600">Rusak/Hlg</th>
                             <th class="px-5 py-3 text-center text-slate-800 border-x border-slate-200">Keluar</th>
                             <th class="px-5 py-3 text-center font-bold text-blue-700 bg-blue-50">Tersedia</th>
-                            <th class="px-5 py-3 text-center admin-only-element">Aksi</th>
+                            <!-- Class no-export agar kolom Aksi tidak ikut tercetak -->
+                            <th class="px-5 py-3 text-center admin-only-element no-export">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100" id="tableBody"></tbody>
@@ -574,12 +582,12 @@
                 </div>
                 <div class="flex gap-2 flex-wrap" id="trxActionsContainer">
                     <button onclick="refreshGlobalData(this)" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 transition shadow-sm"><i class="fa-solid fa-rotate-right mr-1.5"></i> Refresh</button>
-                    <button onclick="exportTableTrx('pdf')" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100 transition shadow-sm"><i class="fa-solid fa-file-pdf mr-1.5"></i> PDF</button>
-                    <button onclick="exportTableTrx('excel')" class="bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-100 transition shadow-sm"><i class="fa-solid fa-file-excel mr-1.5"></i> Excel</button>
+                    <!-- Tombol Export diperbarui -->
+                    <button onclick="exportTableToPDF('tableRiwayat', 'Riwayat_Status_Peminjaman')" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100 transition shadow-sm"><i class="fa-solid fa-file-pdf mr-1.5"></i> PDF</button>
+                    <button onclick="exportTableToExcel('tableRiwayat', 'Riwayat_Status_Peminjaman')" class="bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-100 transition shadow-sm"><i class="fa-solid fa-file-excel mr-1.5"></i> Excel</button>
                 </div>
             </div>
             
-            <!-- Perbaikan UI Filter Responsif -->
             <div class="p-5 bg-slate-50/50 border-b border-slate-100 flex flex-col md:flex-row flex-wrap gap-3 items-center">
                 <div class="relative w-full md:flex-1 min-w-[200px]">
                     <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400"></i>
@@ -600,15 +608,15 @@
                 </div>
             </div>
             
-            <div class="w-full overflow-x-auto p-0 data-fade" id="wrapTrxTable">
-                <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
+            <div class="w-full overflow-x-auto p-0 data-fade custom-scrollbar" id="wrapTrxTable">
+                <table id="tableRiwayat" class="w-full text-left text-sm whitespace-nowrap min-w-max">
                     <thead class="bg-white text-slate-500 border-b border-slate-200 text-xs uppercase tracking-wider">
                         <tr>
                             <th class="px-5 py-3">Info Transaksi</th>
                             <th class="px-5 py-3">Peminjam</th>
                             <th class="px-5 py-3">Rincian Barang</th>
                             <th class="px-5 py-3 text-center">Status</th>
-                            <th class="px-5 py-3 text-center">Aksi</th>
+                            <th class="px-5 py-3 text-center no-export">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100" id="trxBody"></tbody>
@@ -718,14 +726,24 @@
                         <option value="Rusak">Rusak</option>
                         <option value="Hilang">Hilang</option>
                     </select>
-                    <button onclick="exportSls()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-slate-700 whitespace-nowrap shrink-0"><i class="fa-solid fa-download md:mr-1"></i> <span class="hidden md:inline">Export Excel</span></button>
+                    <!-- Tombol Export diperbarui -->
+                    <button onclick="exportTableToPDF('tableSelisih', 'Laporan_Rusak_Hilang')" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-red-100 whitespace-nowrap shrink-0"><i class="fa-solid fa-file-pdf md:mr-1"></i> <span class="hidden md:inline">PDF</span></button>
+                    <button onclick="exportTableToExcel('tableSelisih', 'Laporan_Rusak_Hilang')" class="bg-green-50 text-green-600 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-green-100 whitespace-nowrap shrink-0"><i class="fa-solid fa-file-excel md:mr-1"></i> <span class="hidden md:inline">Excel</span></button>
                 </div>
             </div>
 
-            <div class="w-full overflow-x-auto p-0">
-                <table class="w-full text-left text-sm whitespace-nowrap">
+            <div class="w-full overflow-x-auto p-0 custom-scrollbar">
+                <table id="tableSelisih" class="w-full text-left text-sm whitespace-nowrap min-w-max">
                     <thead class="bg-white text-slate-500 border-b border-slate-200 text-xs uppercase tracking-wider">
-                        <tr><th class="px-5 py-3">Tanggal & ID</th><th class="px-5 py-3">Barang</th><th class="px-5 py-3 text-center">Qty</th><th class="px-5 py-3 text-center">Kasus</th><th class="px-5 py-3">Keterangan</th><th class="px-5 py-3 text-center admin-only-element">Aksi</th></tr>
+                        <tr>
+                            <th class="px-5 py-3">Tanggal & ID</th>
+                            <th class="px-5 py-3">Barang</th>
+                            <th class="px-5 py-3">Sumber / Peminjam</th> <!-- Kolom Baru -->
+                            <th class="px-5 py-3 text-center">Qty</th>
+                            <th class="px-5 py-3 text-center">Kasus</th>
+                            <th class="px-5 py-3">Keterangan</th>
+                            <th class="px-5 py-3 text-center admin-only-element no-export">Aksi</th>
+                        </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100" id="slsBody"></tbody>
                 </table>
@@ -781,7 +799,7 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl mt-2 mb-4 shadow-sm">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl mt-2 mb-4 shadow-sm custom-scrollbar">
                         <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
                             <thead class="bg-slate-100 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-600">
                                 <tr><th class="px-5 py-3">ID Barang</th><th class="px-5 py-3">Detail Spesifikasi</th><th class="px-5 py-3 text-center">Stok Awal</th><th class="px-5 py-3 text-center">Aksi</th></tr>
@@ -816,8 +834,8 @@
                             <button onclick="saveNewUser()" class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition flex items-center gap-2"><i class="fa-solid fa-user-plus"></i> Tambah/Update Akun</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                        <table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-slate-100 border-b border-slate-200 text-xs uppercase text-slate-600"><tr><th class="px-5 py-3">Pengguna</th><th class="px-5 py-3">Login Info</th><th class="px-5 py-3 text-center">Role</th><th class="px-5 py-3 text-center">Aksi</th></tr></thead><tbody id="tblUserList" class="divide-y divide-slate-100"></tbody></table>
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl custom-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap min-w-max"><thead class="bg-slate-100 border-b border-slate-200 text-xs uppercase text-slate-600"><tr><th class="px-5 py-3">Pengguna</th><th class="px-5 py-3">Login Info</th><th class="px-5 py-3 text-center">Role</th><th class="px-5 py-3 text-center">Aksi</th></tr></thead><tbody id="tblUserList" class="divide-y divide-slate-100"></tbody></table>
                     </div>
                 </div>
 
@@ -828,7 +846,7 @@
                         <input type="text" id="setNewCategory" class="w-full sm:w-1/2 border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Kategori Baru...">
                         <button onclick="saveNewCategory()" class="w-full sm:w-auto shrink-0 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">Tambah Kategori</button>
                     </div>
-                    <div class="border border-slate-200 rounded-xl overflow-x-auto mt-4 sm:w-2/3">
+                    <div class="border border-slate-200 rounded-xl overflow-x-auto mt-4 sm:w-2/3 custom-scrollbar">
                         <table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-slate-100 border-b border-slate-200 text-xs uppercase text-slate-600"><tr><th class="px-5 py-3">Nama Kategori</th><th class="px-5 py-3 w-24 text-center">Aksi</th></tr></thead><tbody id="tblCategoryList" class="divide-y divide-slate-100"></tbody></table>
                     </div>
                 </div>
@@ -840,7 +858,7 @@
                         <input type="text" id="setNewLokasi" class="w-full sm:w-1/2 border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Lokasi/Unit Baru...">
                         <button onclick="saveNewLokasi()" class="w-full sm:w-auto shrink-0 bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">Tambah Lokasi</button>
                     </div>
-                    <div class="border border-slate-200 rounded-xl overflow-x-auto mt-4 sm:w-2/3">
+                    <div class="border border-slate-200 rounded-xl overflow-x-auto mt-4 sm:w-2/3 custom-scrollbar">
                         <table class="w-full text-left text-sm whitespace-nowrap"><thead class="bg-slate-100 border-b border-slate-200 text-xs uppercase text-slate-600"><tr><th class="px-5 py-3">Unit / Lokasi</th><th class="px-5 py-3 w-24 text-center">Aksi</th></tr></thead><tbody id="tblLokasiList" class="divide-y divide-slate-100"></tbody></table>
                     </div>
                 </div>
@@ -949,6 +967,102 @@
             }
         });
 
+        // ==========================================
+        // EXPORT FUNCTIONS (EXCEL & PDF)
+        // ==========================================
+        function exportTableToExcel(tableId, filename) {
+            const table = document.getElementById(tableId);
+            if(!table) return;
+
+            // Clone table agar tabel asli tidak berubah saat kolom 'Aksi' dihapus
+            const clonedTable = table.cloneNode(true);
+            
+            // Hapus kolom yang memiliki class 'no-export' (biasanya kolom 'Aksi')
+            const noExportThs = clonedTable.querySelectorAll('th.no-export');
+            noExportThs.forEach(th => {
+                const cellIndex = th.cellIndex;
+                th.parentNode.removeChild(th); // Hapus header
+                // Hapus cell baris terkait
+                const rows = clonedTable.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    if(row.cells.length > cellIndex) {
+                        row.removeChild(row.cells[cellIndex]);
+                    }
+                });
+            });
+
+            // Convert to workbook and download via SheetJS
+            const wb = XLSX.utils.table_to_book(clonedTable, { sheet: "Data" });
+            const today = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `${filename}_${today}.xlsx`);
+        }
+
+        function exportTableToPDF(tableId, filename) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            
+            const table = document.getElementById(tableId);
+            if(!table) return;
+
+            // Header title dokumen PDF
+            doc.setFontSize(14);
+            doc.text(`Laporan: ${filename.replace(/_/g, ' ')}`, 14, 15);
+            doc.setFontSize(10);
+            doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 22);
+
+            // Ekstrak baris dan data, mengabaikan kolom 'no-export'
+            const headers = [];
+            const data = [];
+            
+            let actionColIndex = -1;
+            const thElements = table.querySelectorAll('thead th');
+            thElements.forEach((th, index) => {
+                if(!th.classList.contains('no-export')) {
+                    headers.push(th.innerText.trim());
+                } else {
+                    actionColIndex = index; // Catat indeks kolom yang tidak boleh diexport
+                }
+            });
+
+            const trElements = table.querySelectorAll('tbody tr');
+            trElements.forEach(tr => {
+                const rowData = [];
+                // Skip baris yang merupakan penanda 'Tabel kosong'
+                if(tr.cells.length === 1 && tr.cells[0].colSpan > 1) return;
+
+                Array.from(tr.cells).forEach((td, index) => {
+                    if(index !== actionColIndex) {
+                        let cellText = td.innerText.trim();
+                        // Bersihkan teks tersembunyi yang ada untuk fitur export text (pada Riwayat)
+                        const hiddenExport = td.querySelector('.hidden');
+                        if (hiddenExport) {
+                            cellText = hiddenExport.innerText.trim();
+                        }
+                        rowData.push(cellText);
+                    }
+                });
+                if(rowData.length > 0) data.push(rowData);
+            });
+
+            if(data.length === 0) {
+                Swal.fire('Info', 'Tidak ada data untuk diekspor.', 'info');
+                return;
+            }
+
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: 28,
+                theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2 },
+                headStyles: { fillColor: [37, 99, 235] } 
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+            doc.save(`${filename}_${today}.pdf`);
+        }
+        // ==========================================
+
         function syncLocalState(data) {
             if (!data || typeof data !== 'object') return; 
             State.settings = data.settings || State.settings || {}; 
@@ -957,7 +1071,6 @@
             try { State.locations = State.settings.locations ? JSON.parse(State.settings.locations) : ['Area Kilang', 'Perkantoran', 'Gudang']; } catch(e) { State.locations = ['Umum']; }
             State.masterData = data.master || State.masterData || []; 
             
-            // Parse JSON items in Borrow logic
             State.trxBorrow = (data.borrow || []).map(r => {
                 try { r.ItemsJSON = typeof r.ItemsJSON === 'string' ? JSON.parse(r.ItemsJSON) : (r.ItemsJSON || []); } 
                 catch(e){ r.ItemsJSON = []; }
@@ -1356,7 +1469,7 @@
             document.getElementById('brwSel_Qty').value = 1;
             document.getElementById('brwSel_Ket').value = '';
             
-            document.getElementById('brwLabelSatuan').textContent = item.Satuan || ''; // Fitur Satuan Ditambahkan
+            document.getElementById('brwLabelSatuan').textContent = item.Satuan || '';
 
             const hint = document.getElementById('brwStockHint');
             hint.classList.remove('hidden');
@@ -1377,7 +1490,6 @@
         function loadBorrow(container) {
             container.appendChild(document.getElementById('tpl-borrow').content.cloneNode(true));
             
-            // Generate ID Transaksi Otomatis (Format: TRX-YYYYMMDD-Random4Digit)
             const dateObj = new Date();
             const yyyy = dateObj.getFullYear();
             const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1386,14 +1498,12 @@
             document.getElementById('borrowAutoID').textContent = `TRX-${yyyy}${mm}${dd}-${randomSuffix}`;
 
             const now = new Date();
-            // Auto datetime
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('brwTglPinjam').value = now.toISOString().slice(0,16);
-            document.getElementById('brwTglKembali').valueAsDate = new Date(new Date().setDate(new Date().getDate() + 3)); // Default 3 hari
+            document.getElementById('brwTglKembali').valueAsDate = new Date(new Date().setDate(new Date().getDate() + 3));
 
             document.getElementById('brwLokasi').innerHTML = State.locations.map(l => `<option value="${l}">${l}</option>`).join('');
 
-            // Pre-fill for Peminjam role
             if(State.user.role === 'Peminjam') {
                 const u = State.users.find(x => x.ID === State.user.id) || {};
                 document.getElementById('brwNama').value = u.Nama || State.user.name;
@@ -1501,7 +1611,6 @@
                     runGas('saveBorrow', gasPayload).then(d => {
                         syncLocalState(d);
                         
-                        // Fitur Cetak Bukti Otomatis
                         Swal.fire({
                             title: 'Peminjaman Berhasil', 
                             text: 'Data tercatat dan stok telah dikurangi. Bukti Peminjaman (Surat Jalan) akan dicetak secara otomatis.', 
@@ -1684,7 +1793,6 @@
                     runGas('saveReturn', payload).then(d => {
                         syncLocalState(d);
                         
-                        // Fitur Cetak Bukti Otomatis
                         Swal.fire({
                             title: 'Pengembalian Sukses', 
                             text: `Status Transaksi: ${newStatus}. Bukti Pengembalian akan dicetak secara otomatis.`, 
@@ -1736,7 +1844,6 @@
             tbody.innerHTML = State.filteredData.slice(start, end).map(m => {
                 let sediaCls = m.currentTersedia > 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700';
                 
-                // Fitur: Tambah Edit & Delete pada Database View untuk Admin
                 let actionBtn = `<button onclick="viewMasterDetail('${m.KodeBahan}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded"><i class="fa-solid fa-eye"></i></button>`;
                 
                 if(State.user.role === 'Admin') {
@@ -1756,7 +1863,7 @@
                     <td class="px-5 py-3 text-center font-bold text-rose-600">${m.currentKeluar}</td>
                     <td class="px-5 py-3 text-center text-slate-800 font-bold border-x border-slate-200">0</td>
                     <td class="px-5 py-3 text-center"><span class="px-3 py-1 rounded text-sm font-bold ${sediaCls}">${m.currentTersedia}</span></td>
-                    <td class="px-5 py-3 text-center admin-only-element whitespace-nowrap">${actionBtn}</td>
+                    <td class="px-5 py-3 text-center admin-only-element whitespace-nowrap no-export">${actionBtn}</td>
                 </tr>
                 `;
             }).join('');
@@ -1796,7 +1903,6 @@
             });
         }
 
-        // Fitur Edit dari Tabel Database
         function editAsetFromDB(kode) {
             const idx = State.masterData.findIndex(m => m.KodeBahan === kode);
             if (idx === -1) return;
@@ -1823,8 +1929,6 @@
                     const baruNama = document.getElementById('edDB_Nama').value.trim();
                     if(!baruNama) { Swal.showValidationMessage('Nama Barang wajib diisi!'); return false; }
                     
-                    // Kita manipulasi payload saveMaster untuk memperbarui baris (berfungsi seperti Replace jika kode sama)
-                    // Peringatan: Logika asli (saveMaster) biasanya menimpa berdasarkan ID. Karena kita tidak mengubah ID, ini aman.
                     let updatedItem = {...m};
                     updatedItem.nama = baruNama;
                     updatedItem.kode = m.KodeBahan; 
@@ -1832,7 +1936,6 @@
                     updatedItem.awal = document.getElementById('edDB_Awal').value;
                     updatedItem.satuan = document.getElementById('edDB_Satuan').value;
                     
-                    // Pertahankan properti lama yang tidak diedit di modal ringkas ini
                     updatedItem.merk = m.Merk; updatedItem.ukuran = m.Ukuran; 
                     updatedItem.warna = m.WarnaJenis; updatedItem.detail = m.Detail;
 
@@ -1841,18 +1944,15 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>Swal.showLoading()});
-                    // Hapus sementara state lama (opsional jika backend overwrite), tapi demi keamanan, panggil logika overwrite backend. 
-                    // Kita asumsikan API saveMaster melakukan overwrite jika KodeBahan eksis.
                     runGas('saveMaster', result.value).then(d => {
                         syncLocalState(d);
-                        filterTable(); // Refresh tabel
+                        filterTable(); 
                         Swal.fire('Tersimpan', 'Data aset berhasil diperbarui', 'success');
                     }).catch(e => Swal.fire('Error', 'Gagal update master data', 'error'));
                 }
             });
         }
 
-        // Fitur Delete dari Tabel Database
         function deleteAsetFromDB(kode) {
             const idx = State.masterData.findIndex(m => m.KodeBahan === kode);
             if (idx === -1) return;
@@ -1889,10 +1989,21 @@
                 
                 let mRole = true;
                 if(State.user.role === 'Peminjam') {
-                    let u = State.users.find(x => x.ID === State.user.id) || {};
-                    let myNoPek = u.NoPek || '';
-                    if (myNoPek) mRole = t.NoPek === myNoPek;
-                    else mRole = t.Peminjam.toLowerCase() === State.user.name.toLowerCase();
+                    // Cek berdasarkan Username login (paling valid) atau NoPek jika ada
+                    let u = State.users.find(x => x.Username.toLowerCase() === State.user.username.toLowerCase()) || {};
+                    let myNoPek = u.NoPek ? String(u.NoPek).trim() : '';
+                    let myName = State.user.name.toLowerCase().trim();
+                    let trxPeminjam = String(t.Peminjam).toLowerCase().trim();
+                    let trxNoPek = String(t.NoPek).trim();
+
+                    // Izinkan jika NoPek sama ATAU Nama Peminjam sama
+                    if (myNoPek && trxNoPek === myNoPek) {
+                        mRole = true;
+                    } else if (trxPeminjam === myName) {
+                        mRole = true;
+                    } else {
+                        mRole = false;
+                    }
                 }
 
                 return mQ && mStat && mDate && mRole;
@@ -1913,6 +2024,9 @@
                 
                 let isLate = st !== 'Selesai' && new Date(t.Tenggat) < new Date(new Date().setHours(0,0,0,0));
                 let lateBadge = isLate ? `<span class="bg-rose-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 uppercase animate-pulse">Terlambat</span>` : '';
+
+                // Text version untuk Export Excel
+                let itemsExportText = t.ItemsJSON.map(i => `${i.nama} (${i.qtyPinjam} pinjam | ${i.qtyKembali} kbl | ${i.qtyRusak} rsk)`).join('\n');
 
                 let itemsHtml = t.ItemsJSON.map(i => `
                     <div class="text-[10px] flex justify-between border-b border-slate-100 py-1 last:border-0">
@@ -1941,6 +2055,7 @@
                         <div class="text-xs text-slate-500">Lok: ${t.Lokasi}</div>
                     </td>
                     <td class="px-5 py-3 min-w-[250px]">
+                        <div class="hidden">${itemsExportText}</div> <!-- Info Text untuk file Export PDF/Excel -->
                         <div class="text-[9px] text-slate-400 font-bold flex justify-between border-b border-slate-200 pb-1 mb-1">
                             <span>BARANG</span><span>PJM | KBL | RSK</span>
                         </div>
@@ -1950,7 +2065,7 @@
                         <span class="px-2 py-1 rounded text-xs font-bold ${stClass}">${st}</span>
                         <div class="mt-1">${lateBadge}</div>
                     </td>
-                    <td class="px-5 py-3 text-center whitespace-nowrap">${actions}</td>
+                    <td class="px-5 py-3 text-center whitespace-nowrap no-export">${actions}</td>
                 </tr>
                 `;
             }).join('');
@@ -2082,7 +2197,6 @@
             document.getElementById('sumSelisihRusak').textContent = State.metrics.rusak;
             document.getElementById('sumSelisihHilang').textContent = State.metrics.hilang;
             
-            // Set tanggal default untuk form input manual
             const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             document.getElementById('inSlsTgl').value = now.toISOString().slice(0,16);
 
@@ -2094,7 +2208,6 @@
             form.classList.toggle('hidden');
         }
 
-        // Fitur Input Form Lapor Manual
         function submitSelisihManual() {
             const payload = {
                 tgl: document.getElementById('inSlsTgl').value.replace('T', ' '),
@@ -2104,12 +2217,11 @@
                 satuan: document.getElementById('inSlsSatuan').value,
                 kasus: document.getElementById('inSlsKasus').value,
                 ket: document.getElementById('inSlsKet').value,
-                petugas: State.user.name // Petugas yang menginput
+                petugas: State.user.name
             };
 
             if(!payload.kode || !payload.qty || !payload.ket) return Swal.fire('Error', 'Barang, Qty, dan Keterangan wajib diisi!', 'warning');
 
-            // Format menjadi Array of Object sama seperti ekspektasi di backend saat receive dari Retur
             const logArray = [{
                 kode: payload.kode, nama: payload.nama, qty: parseFloat(payload.qty),
                 satuan: payload.satuan, kondisi: payload.kasus, ket: payload.ket
@@ -2117,7 +2229,6 @@
 
             Swal.fire({title: 'Menyimpan Laporan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
             
-            // Menggunakan fungsi wrapper API backend yg mengeksekusi insert ke tabel Selisih.
             runGas('saveManualSelisih', {
                 tgl: payload.tgl, petugas: payload.petugas, logSelisihJSON: JSON.stringify(logArray)
             }).then(d => {
@@ -2127,7 +2238,6 @@
                 document.getElementById('slsLabelSatuan').textContent = '';
                 toggleFormSelisih();
                 
-                // Update UI metrics without full reload
                 document.getElementById('sumSelisihRusak').textContent = State.metrics.rusak;
                 document.getElementById('sumSelisihHilang').textContent = State.metrics.hilang;
                 filterSls(); 
@@ -2150,18 +2260,40 @@
 
         function renderSlsBody() {
             const tbody = document.getElementById('slsBody');
-            if(State.slsFiltered.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="px-5 py-8 text-center text-slate-400 italic">Tidak ada pencatatan selisih/rusak ditemukan.</td></tr>'; return; }
+            if(State.slsFiltered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="px-5 py-8 text-center text-slate-400 italic">Tidak ada pencatatan selisih/rusak ditemukan.</td></tr>'; return; }
 
             tbody.innerHTML = State.slsFiltered.map(s => {
                 let clsKasus = String(s.Kasus).toLowerCase() === 'rusak' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700';
+                
+                // Ekstraksi ID Transaksi dari kolom Keterangan (Format backend: " (Trx: TRX-XXXX...)")
+                let trxMatch = s.Keterangan ? String(s.Keterangan).match(/\(Trx:\s*(TRX-[A-Z0-9\-]+)\)/i) : null;
+                let infoSumber = '';
+
+                if(trxMatch && trxMatch[1]) {
+                    const parentTrx = State.trxBorrow.find(t => t.ID === trxMatch[1]);
+                    if(parentTrx) {
+                        infoSumber = `<div class="font-bold text-slate-800">${parentTrx.Peminjam}</div><div class="text-[10px] text-slate-500">${parentTrx.Lokasi}</div>`;
+                    } else {
+                        infoSumber = `<div class="font-bold text-slate-800">Transaksi: ${trxMatch[1]}</div>`;
+                    }
+                } else {
+                    // Jika tidak ada ID Trx, diasumsikan Input Manual
+                    infoSumber = `<div class="font-bold text-slate-800">${s.Petugas || '-'}</div><div class="text-[10px] text-slate-500">Input Manual</div>`;
+                }
+
+                // Bersihkan tampilan keterangan (sembunyikan id trx agar rapi)
+                let showKet = s.Keterangan;
+                if(trxMatch) showKet = showKet.replace(trxMatch[0], '').trim();
+
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="px-5 py-3"><div class="font-bold text-slate-700">${s.Tanggal}</div><div class="text-[10px] font-mono text-slate-500">${s.ID}</div></td>
                     <td class="px-5 py-3"><div class="font-bold text-slate-800">${s.NamaBahan}</div><div class="text-[10px] font-mono text-slate-500">${s.KodeBahan}</div></td>
+                    <td class="px-5 py-3">${infoSumber}</td>
                     <td class="px-5 py-3 text-center font-bold text-slate-800">${Math.abs(parseFloat(s.Qty))} <span class="text-xs font-normal text-slate-500">Unit</span></td>
                     <td class="px-5 py-3 text-center"><span class="px-2 py-1 rounded text-xs font-bold ${clsKasus}">${s.Kasus}</span></td>
-                    <td class="px-5 py-3 text-xs italic text-slate-600">${s.Keterangan}</td>
-                    <td class="px-5 py-3 text-center admin-only-element">
+                    <td class="px-5 py-3 text-xs italic text-slate-600">${showKet || '-'}</td>
+                    <td class="px-5 py-3 text-center admin-only-element no-export">
                         <button onclick="deleteSls('${s.ID}')" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
@@ -2204,7 +2336,6 @@
             if(activeBtn) activeBtn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-blue-50 text-blue-700 whitespace-nowrap";
         }
 
-        // Kategori Logic
         function renderCategoryTable() { document.getElementById('tblCategoryList').innerHTML = State.categories.map((c,i)=>`<tr class="hover:bg-slate-50"><td class="px-5 py-3 font-bold">${c}</td><td class="px-5 py-3 text-center"><button onclick="deleteCategoryItem(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''); }
         function saveNewCategory() {
             const v = document.getElementById('setNewCategory').value.trim(); if(!v) return;
@@ -2217,7 +2348,6 @@
             });
         }
 
-        // Lokasi Logic
         function renderLokasiTable() { document.getElementById('tblLokasiList').innerHTML = State.locations.map((l,i)=>`<tr class="hover:bg-slate-50"><td class="px-5 py-3 font-bold">${l}</td><td class="px-5 py-3 text-center"><button onclick="deleteLokasiItem(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''); }
         function saveNewLokasi() {
             const v = document.getElementById('setNewLokasi').value.trim(); if(!v) return;
@@ -2235,7 +2365,6 @@
             runGas('saveSettingsData', { app_title: State.settings.app_title || '', copyright: State.settings.copyright || '', logo_url: State.settings.logo_url || '', locations: JSON.stringify(State.locations) });
         }
 
-        // User Logic
         function renderUserTable() {
             document.getElementById('tblUserList').innerHTML = State.users.map((u,i) => `
                 <tr class="hover:bg-slate-50">
@@ -2281,7 +2410,7 @@
 
         function editUser(idx) {
             const u = State.users[idx];
-            document.getElementById('setUserId').value = u.ID; // Store ID for updating
+            document.getElementById('setUserId').value = u.ID; 
             document.getElementById('setUserName').value = u.Nama;
             document.getElementById('setUserNoPek').value = u.NoPek;
             document.getElementById('setUserHP').value = u.NoHP;
@@ -2304,7 +2433,7 @@
         function saveNewUser() {
             const userId = document.getElementById('setUserId').value;
             const p = {
-                id: userId ? userId : 'U'+Date.now(), // Gunakan ID lama jika edit
+                id: userId ? userId : 'U'+Date.now(),
                 name: document.getElementById('setUserName').value,
                 noPek: document.getElementById('setUserNoPek').value,
                 noHP: document.getElementById('setUserHP').value,
@@ -2319,7 +2448,7 @@
             runGas('saveUser', p).then(d => {
                 syncLocalState(d);
                 renderUserTable();
-                resetUserForm(); // Clear form after success
+                resetUserForm(); 
                 Swal.close();
             }).catch(e => Swal.fire('Error','Gagal menyimpan pengguna','error'));
         }
@@ -2338,7 +2467,6 @@
             });
         }
 
-        // Master Logic
         function renderMasterTable() {
             document.getElementById('tblMasterList').innerHTML = State.masterData.map((m,i)=>`
             <tr class="hover:bg-slate-50">
