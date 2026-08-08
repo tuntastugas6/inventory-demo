@@ -366,10 +366,13 @@
                         <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 flex flex-col md:flex-row gap-3 items-start md:items-end relative">
                             <div class="w-full md:flex-1 relative" id="wrapBorrowDropdown">
                                 <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Pilih Barang (Jenis & Spesifikasi)</label>
-                                <div class="relative">
-                                    <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
-                                    <input type="text" id="brwSearch" onkeyup="filterDropdown('borrow')" onfocus="showDropdown('borrow')" oninput="handleEmptyInput('borrow')" class="w-full border border-slate-300 rounded-lg pl-9 pr-8 py-2 text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none font-medium" placeholder="Ketik nama atau ID barang...">
-                                    <i class="fa-solid fa-chevron-down absolute right-3 top-2.5 text-slate-400 cursor-pointer text-xs" onclick="toggleDropdown('borrow')"></i>
+                                <div class="relative flex items-center">
+                                    <i class="fa-solid fa-search absolute left-3 text-slate-400 text-sm"></i>
+                                    <input type="text" id="brwSearch" onkeyup="filterDropdown('borrow')" onfocus="showDropdown('borrow')" oninput="handleEmptyInput('borrow')" class="w-full border border-slate-300 rounded-lg pl-9 pr-14 py-2 text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none font-medium" placeholder="Ketik nama atau ID barang...">
+                                    <button type="button" onclick="resetBorrowAsset()" class="absolute right-8 text-slate-400 hover:text-red-500 hidden transition-colors" id="btnBrwClearAsset" title="Pilih Ulang Aset">
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                    </button>
+                                    <i class="fa-solid fa-chevron-down absolute right-3 text-slate-400 cursor-pointer text-xs" onclick="toggleDropdown('borrow')"></i>
                                 </div>
                                 <ul id="listDrop_borrow" class="hidden absolute z-50 w-full bg-white border border-slate-300 shadow-xl rounded-lg mt-1 max-h-60 overflow-y-auto custom-scrollbar"></ul>
                                 <!-- Hidden Fields -->
@@ -1444,13 +1447,16 @@
                     document.getElementById('brwSel_Kode').value = '';
                     document.getElementById('brwLabelSatuan').textContent = '';
                     document.getElementById('brwStockHint').classList.add('hidden');
+                    document.getElementById('btnBrwClearAsset').classList.add('hidden');
                 } else {
                     document.getElementById('inSlsKode').value = '';
                     document.getElementById('slsLabelSatuan').textContent = '';
                     document.getElementById('btnSlsClearAsset').classList.add('hidden');
                 }
             } else if (!isBorrow) {
-                document.getElementById('btnSlsClearAsset').classList.add('hidden');
+                document.getElementById('btnSlsClearAsset').classList.remove('hidden');
+            } else if (isBorrow) {
+                document.getElementById('btnBrwClearAsset').classList.remove('hidden');
             }
         }
 
@@ -1473,6 +1479,8 @@
             const hint = document.getElementById('brwStockHint');
             hint.classList.remove('hidden');
             document.getElementById('brwStockVal').textContent = `${item.currentTersedia} ${item.Satuan}`;
+            
+            document.getElementById('btnBrwClearAsset').classList.remove('hidden');
 
             setTimeout(() => document.getElementById('brwSel_Qty').focus(), 100);
         }
@@ -1496,6 +1504,26 @@
             document.getElementById('btnSlsClearAsset').classList.add('hidden');
             document.getElementById('inSlsSearch').focus();
             filterDropdown('selisih');
+        }
+
+        function resetBorrowAsset() {
+            document.getElementById('brwSearch').value = '';
+            document.getElementById('brwSel_Kode').value = '';
+            document.getElementById('brwSel_Nama').value = '';
+            document.getElementById('brwSel_Merk').value = '';
+            document.getElementById('brwSel_Ukuran').value = '';
+            document.getElementById('brwSel_Warna').value = '';
+            document.getElementById('brwSel_Satuan').value = '';
+            document.getElementById('brwSel_Max').value = '';
+            document.getElementById('brwSel_Qty').value = 1;
+            document.getElementById('brwSel_Ket').value = '';
+            
+            document.getElementById('brwLabelSatuan').textContent = '';
+            document.getElementById('brwStockHint').classList.add('hidden');
+            document.getElementById('btnBrwClearAsset').classList.add('hidden');
+            
+            document.getElementById('brwSearch').focus();
+            filterDropdown('borrow');
         }
 
         function loadBorrow(container) {
@@ -1562,6 +1590,7 @@
             document.getElementById('brwSel_Qty').value='1'; document.getElementById('brwSel_Ket').value='';
             document.getElementById('brwStockHint').classList.add('hidden');
             document.getElementById('brwLabelSatuan').textContent='';
+            document.getElementById('btnBrwClearAsset').classList.add('hidden');
 
             renderBorrowCart();
         }
