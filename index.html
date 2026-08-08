@@ -897,7 +897,7 @@
                                 <div class="flex-1">
                                     <input type="file" id="setAppLogoFile" accept="image/png, image/jpeg, image/svg+xml" onchange="handleLogoUpload(event)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                                     <input type="hidden" id="setAppLogoData">
-                                    <p class="text-[10px] text-slate-500 mt-1">Format: PNG, JPG, SVG. Rekomendasi rasio 1:1, Maksimal 1MB.</p>
+                                    <p class="text-[10px] text-slate-500 mt-1">Format: PNG, JPG, SVG. Gambar otomatis di-resize & kompres agar super ringan.</p>
                                 </div>
                             </div>
                         </div>
@@ -2571,11 +2571,41 @@
         function handleLogoUpload(e) {
             const file = e.target.files[0];
             if(!file) return;
-            if(file.size > 1024 * 1024) return Swal.fire('Error', 'Ukuran gambar maksimal 1MB', 'error');
+            
             const reader = new FileReader();
             reader.onload = (ev) => {
-                document.getElementById('previewAppLogo').src = ev.target.result;
-                document.getElementById('setAppLogoData').value = ev.target.result;
+                const img = new Image();
+                img.onload = () => {
+                    // Tingkatkan batas ukuran maksimal menjadi 800px agar logo tetap sangat tajam dan tidak blur (HD)
+                    const MAX_SIZE = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Kalkulasi rasio agar proporsional
+                    if (width > height) {
+                        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                    } else {
+                        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                    }
+
+                    // Render gambar ke canvas untuk dikompres
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Aktifkan image smoothing untuk kualitas render terbaik
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Konversi ke Base64 dengan format webp dan kualitas tinggi (0.95 atau 95%) 
+                    // Base64 tetap jauh lebih pendek daripada file asli, namun ketajaman gambar terjaga.
+                    const compressedBase64 = canvas.toDataURL('image/webp', 0.95);
+                    
+                    document.getElementById('previewAppLogo').src = compressedBase64;
+                    document.getElementById('setAppLogoData').value = compressedBase64;
+                };
+                img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -2584,7 +2614,20 @@
             const logoData = document.getElementById('setAppLogoData').value;
             const setLoc = JSON.stringify(State.locations);
             Swal.fire({title:'Menyimpan...', allowOutsideClick:false, didOpen:()=>Swal.showLoading()});
-            runGas('saveSettingsData', { app_title: document.getElementById('setAppTitle').value, copyright: document.getElementById('setAppCopy').value, logo_url: logoData, locations: setLoc }).then(d=>{syncLocalState(d); applySettings(); Swal.fire('Tersimpan','','success')});
+            
+            runGas('saveSettingsData', { 
+                app_title: document.getElementById('setAppTitle').value, 
+                copyright: document.getElementById('setAppCopy').value, 
+                logo_url: logoData, 
+                locations: setLoc 
+            }).then(d => {
+                syncLocalState(d); 
+                applySettings(); 
+                Swal.fire('Tersimpan','Pengaturan identitas berhasil diperbarui','success');
+            }).catch(err => {
+                // Menutup loading jika terjadi error jaringan / timeout
+                Swal.fire('Error', 'Gagal menyimpan pengaturan. Pastikan koneksi stabil.', 'error');
+            });
         }
     </script>
 </body>
